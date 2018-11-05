@@ -185,7 +185,26 @@ ggplot(data = snp, aes(x = comments_count_fb, fill = type)) +
 ##############################
 
 # We could also create a plot for two variables:
-# This time have to specify both 'x = ...' and 'y = ...' in aes().
+# This time have to specify both x and y axes with 'x = ...' and 'y = ...' in aes().
+
+# We could try one categorical variable with one continuous varible
+# First with specify the axes
+ggplot(data = snp, aes(x = type, y = likes_count_fb))
+
+# Then we add the geom we wantgeom
+ggplot(data = snp, aes(x = type, y = likes_count_fb)) +
+  geom_boxplot()
+
+########## Exercise ########## 
+# Using the codes above, try to create a violin plot with 'geom_violin()'
+##############################
+
+########## Solution ########## 
+ggplot(data = snp, aes(x = type, y = likes_count_fb)) +
+  geom_violin()
+##############################
+
+# We could also create a plot for two continuous variables:
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb))
 
 # We could use geom_point() for scatter plot
@@ -198,12 +217,12 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = "red")
 
 # Or coloring them by post type
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type)) +
-  geom_point(alpha = 0.5) 
+  geom_point() 
 
 # There are many things you can do by adding layers into the ggplot
 # You could log them
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type)) +
-  geom_point(alpha = 0.5) +
+  geom_point(alpha = 0.5) + # I made the points transparent for visiblity
   scale_x_log10() +
   scale_y_log10()
 
@@ -258,17 +277,18 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
   facet_wrap(~ type)
 
 ########## Exercise ########## 
-# Make a scatter plot of shares by comments, log both axes,
-# color by post type, shape by post type (adding 'shape = type' in aes())
+# Make a scatter plot of shares by comments count, log both axes,
+# color them by post type, change shape by post type (adding 'shape = type' in aes())
 ##############################
 
+########## Solution ########## 
 ggplot(data = snp, aes(x = shares_count_fb, y = comments_count_fb, color = type, shape = type)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
   scale_y_log10() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(x = "Comments Count", y = "Likes Count",
-       title = "Comments and Likes",
+  labs(x = "Comments Count", y = "Shares Count",
+       title = "Comments and Shares",
        subtitle = "One post per dot",
        caption = "Source: Justin Ho")
 
@@ -283,9 +303,8 @@ ggplot(data = snp, aes(x = shares_count_fb, y = comments_count_fb, color = type,
 library(scales)
 library(lubridate)
 
-
-# To plot a time series, the first thing you have to do is to transform your data in to time
-# There are many formats for time, but the simpliest way would probably be:
+# To plot a time series, the first thing you have to do is to transform your data into time/date format
+# There are many formats for time and date, but the simpliest way would probably be:
 
 snp$date <- as.Date(snp$post_published) # Defining a new column called 'date'
 
@@ -319,31 +338,62 @@ ggplot(data = snp, aes(x = date, y = likes_count_fb, color = type)) +
   geom_smooth(method = 'loess') +
   geom_point(alpha = 0.3) +
   scale_x_date(labels = date_format("%m/%y"), date_breaks = "1 month") +
-  ylim(c(0, 3000))
+  ylim(c(0, 2000))
 
 ####################################################################################
-## Data Wrangling with ggplot2                                                    ##
+## Data Wrangling with dplyr                                                      ##
 ####################################################################################
 # We need this package
 # install.packages("dplyr")
 library(dplyr)
 
 # For some plots, it might be easier if you transform the data in advance
+# To do so, we have to learn a few things:
+# '%>%' is a pipping operator, it acts as a pipe line: 
+# the output before the pipping operator will feed into the next function as the input
+
+# We also need the following functions:
+# group_by() is a function to split the data into groups
+# summarise() is a function to make calculation and put the result into a new variable
 
 plot_data <- snp %>% 
-  group_by(type, date=floor_date(date, "month")) %>% 
-  summarise(total_likes = sum(likes_count_fb))
+  group_by(type, date=floor_date(date, "month")) %>% # split the data by post type and by month
+  summarise(total_likes = sum(likes_count_fb)) # calculate total likes by taking the sum of likes count
   
-
-
+# Have a look at the transformed data
 ggplot(data = plot_data, aes(x = date, y = total_likes, color = type)) +
   geom_line()
 
+# We could use a new geom, geom_area for area plots
+# There are three positions, "stack" means stacking one on top of the other
 ggplot(data = plot_data, aes(x = date, y = total_likes, fill = type)) +
   geom_area(position = "stack")
 
+# "identity would overlap. You might want to make it transparent
 ggplot(data = plot_data, aes(x = date, y = total_likes, fill = type)) +
   geom_area(position = "identity", alpha = 0.8)
 
+# "fill" would calculate the proportion of the post type each day and fill the whole plot
 ggplot(data = plot_data, aes(x = date, y = total_likes, fill = type)) +
-  geom_area(position = "fill", alpha = 0.8)
+  geom_area(position = "fill")
+
+########## Exercise ########## 
+# Using the above codes, aggregate comment counts by month.
+# Plot an area plot (selection a sensibile position)
+
+# TIPS:
+# plot_data <- snp %>% 
+#   group_by(type, date=floor_date(date, "month")) %>%
+#   summarise(###### = sum(#######))  # Change the ########### into the variable names
+##############################
+
+########## Solution ########## 
+
+plot_data <- snp %>% 
+  group_by(type, date=floor_date(date, "month")) %>%
+  summarise(total_comments = sum(comments_count_fb))
+
+ggplot(data = plot_data, aes(x = date, y = total_comments, fill = type)) +
+  geom_area(position = "identity", alpha = 0.8)
+
+##############################

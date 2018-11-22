@@ -1,40 +1,27 @@
 # Introduction to R
+# Last updated: 22 Nov 2018
 
 ####################################################################################
-## Creating objects in R                                                          ##
+## Loading dataset into R                                                         ##
 ####################################################################################
 
 # You can get output from R simply by typing math in the console.
-# 
 # However, to do useful and interesting things, we need to assign values to
 # objects. To create an object, we need to give it a name followed by the
-# assignment operator `<-`, and the value we want to give it:
-# 
+# assignment operator `<-`.
+# The following code will load a dataset into R's memory and stored an object named 'snp'.
+
+snp <- read.csv("snp.csv") # Load the file 'snp.csv', put it as an object called 'snp'
+
 # When assigning a value to an object, R does not print anything. 
 # You can print the value by typing the object name:
 
-area_hectares <- 1.0    # doesn't print anything
-area_hectares # printing it
+snp
 
-# Now that R has `area_hectares` in memory, we can do arithmetic with it. For
-# instance, we may want to convert this area into acres (area in acres is 2.47 times the area in hectares):
-
-2.47 * area_hectares
-
-# We can also change an object's value by assigning it a new one:
-area_hectares <- 2.5
-2.47 * area_hectares
-
-########## Small Exercise ########## 
-# Create two variables `length` and `width` and assign them values of your choice.
-# Create a third variable `area` and give it a value based on 
-# the current values of `length` and `width` (`length * width`).
-####################################
-
-
-####################################################################################
-## Functions and their arguments                                                  ##
-####################################################################################
+# However, print a large object directly is often not a good idea,
+# as you can see, the output is simply too large to display in one page.
+# Sometimes, you might even crash your R if the object is too large.
+# To safely view a portion of an object, you could use the 'head()' function
 
 ## Functions:
 # - Functions are "canned scripts"
@@ -42,105 +29,108 @@ area_hectares <- 2.5
 # - A function usually gets one or more inputs called *arguments*
 # - Can return a single value, and also a set of things, or even a dataset 
 
-# Example:
-b <- sqrt(100)
-
 ## Arguments:
 # - can be anything (numbers, filenames, objects etc)
 # - must be looked up in the documentation
 # - Some functions take on a *default* value
 
-# Let's try a function that can take multiple arguments: `round()`.
-round(3.14159)
+# The 'head()' function will return the first sixth element of an object:
+head(snp)
 
-# Here, we've called `round()` with just one argument, `3.14159`, and it has
-# returned the value `3`.  That's because the default is to round to the nearest
-# whole number. If we want more digits we can see how to do that by getting
-# information about the `round` function.  We look at the help for this function using `?round`.
+# We could also look at the help for this function using `?head`
 
-?round
+?head
 
-# We see that if we want a different number of digits, we can
-# type `digits=2` or however many we want.
+# We see that if we want a different size of resulting, we can add an argument:
 
-round(3.14159, digits = 2)
+head(snp, n = 10)
 
 # If you provide the arguments in the exact same order as they are defined you
 # don't have to name them:
 
-round(3.14159, 2)
+head(snp, 10)
 
-# It's good practice to put the non-optional arguments (like the number you're
-# rounding) first in your function call, and to specify the names of all optional
-# arguments.  If you don't, someone reading your code might have to look up the
-# definition of a function with unfamiliar arguments to understand what you're
-# doing.
+########## Exercise ########## 
+# Using the 'tail()' function, find out the date of the last post in the dataset.
+##############################
 
 
 ####################################################################################
-## Vectors and dataframes                                                         ##
+## Two Basic Data Types: Dataframes and Vectors                                   ##
 ####################################################################################
 
-## Vector
-# - composed by a series of values, can be either numbers or characters. 
-# - can be assigned using the `c()` function.
-
-# A vector can contain characters. For example, we can create a vector of name of fruits:
-
-fruit <- c("apple", "orange", "banana")
-fruit
-
-# A vector can also contain numbers. For example, we can create a vector of price:
-
-price <- c(3, 7, 10)
-price
-
-# You could use the slicing operater to get a part of a vector:
-
-fruit[1] # Get the first element
-fruit[1:2] # From the first to the second
-fruit[-1] # everything except the first
-
-## Dataframes
-# Dataframes are representations of data in table format
-# We could combine multiple vectors into a dataframe like this:
-
-df <- data.frame(fruit, price)
-
-## Inspecting data frames
+# Dataframes are representations of data in table format (like an Excel spreadsheet)
 # There are functions to extract this information from data frames.
 # Here is a non-exhaustive list of some of these functions:
 # 
 # Size:
-dim(df) # returns number of rows, number of columns
-nrow(df) # returns the number of rows
-ncol(df) # returns the number of columns
+dim(snp) # returns number of rows, number of columns
+nrow(snp) # returns the number of rows
+ncol(snp) # returns the number of columns
 
 # Summary:
-str(df) # structure of the object and information about the class, length and content of each column
-summary(df) # summary statistics for each column
+str(snp) # structure of the object and information about the class, length and content of each column
+summary(snp) # summary statistics for each column
 
-# Same as vector, you could use the slicing operater to get a part of a dataframe
-# However, this time we have to specify both the row and columes:
+# To extract a subset of the dataframe, we could use the slicing operater '[' and ']'
+# Remember we have to specify first the row and second colume:
 
-df[1,1] # First row, first column
-df[1,2] # First row, second column
-df[1,] # Frist row, all columns (leaving it empty means getting everything)
-df[2,] # Second row, all columns (leaving it empty means getting everything)
-df[,1] # Frist column, all row (leaving it empty means getting everything)
+snp[1,1] # First row, first column
+snp[1,] # Frist row, all columns (leaving it empty means getting everything)
+snp[,1] # Frist column, all row (leaving it empty means getting everything)
+snp[1:6,] # The first six rows, this is same as the 'head()'
 
-# Alternatively, you could extract the whole column using '$':
-df$fruit
-df$price
+# Dataframes are comprised of vectors
+# A vector is a series of values, can be either numbers or characters. 
+# Vector can be assigned using the `c()` function, for example:
 
-## Loading dataframe from a file
-# Instead of typing your whole dataset, 
-# you could load the data in R's memory using the function `read.csv()`
+names <- c("Foo", "Bar", "Baz")
+names
 
-snp <- read.csv("snp.csv") # Load the file 'snp.csv', put it as an object called 'snp'
-str(snp)
-summary(snp)
+# You could also use the slicing operater to get a part of a vector:
+# Remember this time you only have to specify the index (not row and column) 
+names[1] # Get the first element
+names[1:2] # From the first to the second
+names[-1] # everything except the first
 
+# Since dataframes are comprised of vectors, 
+# We can extract the whole column as a vector using '$':
+snp$date
+snp$likes_count_fb
+
+# We could use functions to gain information from the vector
+# For example, 'mean()' will gives us the mean, 'max()' will give us the maximun value
+length(snp$likes_count_fb)
+max(snp$likes_count_fb)
+mean(snp$likes_count_fb)
+
+########## Exercise ########## 
+# Using the 'mean()' function, alter the codes below and calculate the mean value of 
+# likes (likes_count_fb), comments (comments_count_fb), and shares (shares_count_fb).
+# Put the result into the follow objects: 'mean_like', 'mean_comments', 'mean_shares'
+
+mean_like <- # Fill in your codes here #
+mean_comments <- # Fill in your codes here #
+# Fill in your codes here for 'mean_shares' #
+##############################
+
+# For more advanced usage of functions, we could use 'which.max()' the identify the element that
+# contains the maximum value
+which.max(snp$likes_count_fb)
+
+# The result is 676, meaning that the 676th post of the dataset has the most likes.
+# We can then use the slicing operator ('[' and ']') to find the post:
+snp[676, ]
+
+# We can combine them into one single link:
+snp[which.max(snp$likes_count_fb), ]
+
+########## Exercise ########## 
+# Find out which post has most comments and shares
+snp[which.max(snp$comments_count_fb), ]
+snp[which.max(snp$shares_count_fb), ]
+
+##############################
 
 ####################################################################################
 ## Data visualisation with ggplot2                                                ##
@@ -163,53 +153,77 @@ ggplot(data = snp, aes(x = comments_count_fb))
 ggplot(data = snp, aes(x = comments_count_fb)) +
   geom_histogram()
 
-# to use another geom, just change geom_histogram() to any geom_*
+# We could change the binwidth by adding arguments
 ggplot(data = snp, aes(x = comments_count_fb)) +
-  geom_density()
+  geom_histogram(binwidth = 100)
+
+# We could add a line showing the mean value by adding a geom
+ggplot(data = snp, aes(x = comments_count_fb)) +
+  geom_histogram(binwidth = 100) +
+  geom_vline(xintercept=mean_comments, color = "red", linetype = "dashed")
 
 # We could change color by adding arguments (fill means color of the filling in ggplot2)
 ggplot(data = snp, aes(x = comments_count_fb, fill = "red")) +
-  geom_density()
+  geom_histogram(binwidth = 100)
 
 # How about making it transparent?
 ggplot(data = snp, aes(x = comments_count_fb, fill = "red")) +
-  geom_density(alpha = 0.5)
+  geom_histogram(binwidth = 100, alpha = 0.8)
 
 # We can easily coloring them by group by changing "red" to type 
 # (the column that contain information about post type in the snp dataframe)
 ggplot(data = snp, aes(x = comments_count_fb, fill = type)) +
-  geom_density(alpha = 0.5)
+  geom_histogram(binwidth = 100, alpha = 0.8)
 
 ########## Exercise ########## 
-# Using the codes above, try to create a density plot for Likes count ('likes_count_fb')
+# Using the codes above, try to create a histogarm for Likes count ('likes_count_fb')
 ##############################
 
-# We could also create a plot for two variables:
-# This time have to specify both x and y axes with 'x = ...' and 'y = ...' in aes().
+####################################################################################
+## Visualising two categorical variables                                          ##
+####################################################################################
 
-# We could try one categorical variable with one continuous varible
-# First with specify the axes
-ggplot(data = snp, aes(x = type, y = likes_count_fb))
+# We could create a bar plot:
+ggplot(snp, aes(x = type)) + 
+  geom_bar()
 
-# Then we add the geom we wantgeom
-ggplot(data = snp, aes(x = type, y = likes_count_fb)) +
-  geom_boxplot()
+# We could also create a plot for two categorical variables
+# We color the bar by the sentiment of the posts
+ggplot(snp, aes(x = type, y = ..count.., fill = sentiment)) + 
+  geom_bar()
 
-########## Exercise ########## 
-# Using the codes above, try to create a violin plot with 'geom_violin()'
-##############################
+# We can change how these bars are placed, 
+# for example 'position = "dodge"' will place them side by side
+ggplot(snp, aes(x = type, y = ..count.., fill = sentiment)) + 
+  geom_bar(position = "dodge")
 
-########## Solution ########## 
-ggplot(data = snp, aes(x = type, y = likes_count_fb)) +
-  geom_violin()
-##############################
+# If we use 'position = "fill"', all bar will strech out to fill the whole y axis
+# The y axis then become proportion
+ggplot(snp, aes(x = type, y = ..count.., fill = sentiment)) + 
+  geom_bar(position = "fill") +
+  labs(y = "proportion")
 
-# We could also create a plot for two continuous variables:
+####################################################################################
+## Visualising two continuous variables                                           ##
+####################################################################################
+
+# Creating a plot for two continuous variables (comments and likes):
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb))
 
 # We could use geom_point() for scatter plot
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
   geom_point()
+
+# Again, you can add the mean values 
+ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
+  geom_point() +
+  geom_vline(xintercept = mean_comments) +
+  geom_hline(yintercept = mean_like)
+
+# You can even add the same geom twice, which different values on the x and y axes
+ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
+  geom_point() +
+  geom_point(aes(x = mean_comments, y = mean_like, color = "red", size = 6))
 
 # Use the argument 'color = "red"' for red dots
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = "red")) +
@@ -231,14 +245,14 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type))
   geom_point(alpha = 0.5) +
   scale_x_log10() +
   scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE, size = 2)
+  geom_smooth(method = "lm", se = FALSE)
 
 # And add labels
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
   scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE, size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
   labs(x = "Comments Count", y = "Likes Count",
      title = "Comments and Likes",
      subtitle = "One post per dot",
@@ -249,7 +263,7 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type))
   geom_point(alpha = 0.5) +
   scale_x_log10() +
   scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE, size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
   labs(x = "Comments Count", y = "Likes Count",
        title = "Comments and Likes",
        subtitle = "One post per dot",
@@ -261,7 +275,7 @@ myplot <- ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, colo
   geom_point(alpha = 0.5) +
   scale_x_log10() +
   scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE, size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
   labs(x = "Comments Count", y = "Likes Count",
        title = "Comments and Likes",
        subtitle = "One post per dot",
@@ -273,12 +287,12 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
   scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE, size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~ type)
 
 ########## Exercise ########## 
 # Make a scatter plot of shares by comments count, log both axes,
-# color them by post type, change shape by post type (adding 'shape = type' in aes())
+# color them by post type, change shape by post type (adding 'shape = sentiment ' in aes())
 ##############################
 
 ########## Solution ########## 
@@ -306,7 +320,7 @@ library(lubridate)
 # To plot a time series, the first thing you have to do is to transform your data into time/date format
 # There are many formats for time and date, but the simpliest way would probably be:
 
-snp$date <- as.Date(snp$post_published) # Defining a new column called 'date'
+snp$date <- as.Date(snp$date) # Defining a new column called 'date'
 
 # Simply plot the same scatter point, using 'date' as the x axis
 ggplot(data = snp, aes(x = date, y = likes_count_fb)) +
@@ -388,7 +402,6 @@ ggplot(data = plot_data, aes(x = date, y = total_likes, fill = type)) +
 ##############################
 
 ########## Solution ########## 
-
 plot_data <- snp %>% 
   group_by(type, date=floor_date(date, "month")) %>%
   summarise(total_comments = sum(comments_count_fb))

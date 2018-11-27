@@ -2,6 +2,14 @@
 # Last updated: 22 Nov 2018
 
 ####################################################################################
+## Installing packages                                                            ##
+####################################################################################
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("scales")
+install.packages("lubridate")
+
+####################################################################################
 ## Loading dataset into R                                                         ##
 ####################################################################################
 
@@ -11,7 +19,7 @@
 # assignment operator `<-`.
 # The following code will load a dataset into R's memory and stored an object named 'snp'.
 
-snp <- read.csv("snp.csv") # Load the file 'snp.csv', put it as an object called 'snp'
+snp <- read.csv("snp.csv", stringsAsFactors = FALSE) # Load the file 'snp.csv', put it as an object called 'snp'
 
 # When assigning a value to an object, R does not print anything. 
 # You can print the value by typing the object name:
@@ -38,19 +46,16 @@ snp
 head(snp)
 
 # We could also look at the help for this function using `?head`
-
 ?head
 
-# We see that if we want a different size of resulting, we can add an argument:
-
+# We see that if we want a different size for the result, we can add an argument:
 head(snp, n = 10)
 
 # If you provide the arguments in the exact same order as they are defined you
 # don't have to name them:
-
 head(snp, 10)
 
-########## Exercise ########## 
+########## Exercise 1 ########## 
 # Using the 'tail()' function, find out the date of the last post in the dataset.
 ##############################
 
@@ -58,6 +63,8 @@ head(snp, 10)
 ####################################################################################
 ## Two Basic Data Types: Dataframes and Vectors                                   ##
 ####################################################################################
+# To find out the data type of an object, we could use the 'class()' function:
+class(snp)
 
 # Dataframes are representations of data in table format (like an Excel spreadsheet)
 # There are functions to extract this information from data frames.
@@ -65,15 +72,15 @@ head(snp, 10)
 # 
 # Size:
 dim(snp) # returns number of rows, number of columns
-nrow(snp) # returns the number of rows
-ncol(snp) # returns the number of columns
+nrow(snp) # returns the number of rows (post)
+ncol(snp) # returns the number of columns (var)
 
 # Summary:
 str(snp) # structure of the object and information about the class, length and content of each column
 summary(snp) # summary statistics for each column
 
 # To extract a subset of the dataframe, we could use the slicing operater '[' and ']'
-# Remember we have to specify first the row and second colume:
+# Remember we have to specify the index for both the row and column:
 
 snp[1,1] # First row, first column
 snp[1,] # Frist row, all columns (leaving it empty means getting everything)
@@ -104,17 +111,17 @@ length(snp$likes_count_fb)
 max(snp$likes_count_fb)
 mean(snp$likes_count_fb)
 
-########## Exercise ########## 
+########## Exercise 2 ########## 
 # Using the 'mean()' function, alter the codes below and calculate the mean value of 
 # likes (likes_count_fb), comments (comments_count_fb), and shares (shares_count_fb).
-# Put the result into the follow objects: 'mean_like', 'mean_comments', 'mean_shares'
+# Put the result into the follow objects: 'mean_like', 'mean_comment', 'mean_share'
 
 mean_like <- # Fill in your codes here #
-mean_comments <- # Fill in your codes here #
-# Fill in your codes here for 'mean_shares' #
+mean_comment <- # Fill in your codes here #
+# Fill in your codes here for 'mean_share' #
 ##############################
 
-# For more advanced usage of functions, we could use 'which.max()' the identify the element that
+# For more advanced usage of functions, we could use 'which.max()' to identify the element that
 # contains the maximum value
 which.max(snp$likes_count_fb)
 
@@ -125,11 +132,13 @@ snp[676, ]
 # We can combine them into one single link:
 snp[which.max(snp$likes_count_fb), ]
 
-########## Exercise ########## 
+########## Exercise 3 ########## 
 # Find out which post has most comments and shares
-snp[which.max(snp$comments_count_fb), ]
-snp[which.max(snp$shares_count_fb), ]
 
+# Tricky Questions: Could you find out how to just extract the link?
+# Tips: start with extracting all the links ('snp$post_link'),
+# then use the index to select the one we want
+ 
 ##############################
 
 ####################################################################################
@@ -139,14 +148,11 @@ snp[which.max(snp$shares_count_fb), ]
 # install.packages("ggplot2") # You only have to run it once
 library(ggplot2)
 
-# To build a ggplot, we will use the following basic template:
-# ggplot(data = <DATA>, mapping = aes(<MAPPINGS>)) +  <GEOM_FUNCTION>()
-#
 # Building plots with **`ggplot2`** is typically an iterative process. 
 # We start by defining the dataset we'll use:
 ggplot(data = snp)
 
-# lay out the axis(es), for example we can plot the Comments count ('comments_count_fb'):
+# lay out the axis(es), for example we can set up the axis for the Comments count ('comments_count_fb'):
 ggplot(data = snp, aes(x = comments_count_fb))
 
 # and finally choose a geom
@@ -158,9 +164,14 @@ ggplot(data = snp, aes(x = comments_count_fb)) +
   geom_histogram(binwidth = 100)
 
 # We could add a line showing the mean value by adding a geom
+# We have done this earlier but I am doing it again just in case.
+mean_like <- mean(snp$likes_count_fb)
+mean_comment <- mean(snp$comments_count_fb)
+mean_share <- mean(snp$shares_count_fb)
+
 ggplot(data = snp, aes(x = comments_count_fb)) +
   geom_histogram(binwidth = 100) +
-  geom_vline(xintercept=mean_comments, color = "red", linetype = "dashed")
+  geom_vline(xintercept=mean_comment, color = "red", linetype = "dashed")
 
 # We could change color by adding arguments (fill means color of the filling in ggplot2)
 ggplot(data = snp, aes(x = comments_count_fb, fill = "red")) +
@@ -175,9 +186,11 @@ ggplot(data = snp, aes(x = comments_count_fb, fill = "red")) +
 ggplot(data = snp, aes(x = comments_count_fb, fill = type)) +
   geom_histogram(binwidth = 100, alpha = 0.8)
 
-########## Exercise ########## 
-# Using the codes above, try to create a histogarm for Likes count ('likes_count_fb')
+########## Exercise 4 ########## 
+# Using the codes above, create a histogram for Likes count ('likes_count_fb')
+
 ##############################
+
 
 ####################################################################################
 ## Visualising two categorical variables                                          ##
@@ -217,13 +230,13 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
 # Again, you can add the mean values 
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
   geom_point() +
-  geom_vline(xintercept = mean_comments) +
+  geom_vline(xintercept = mean_comment) +
   geom_hline(yintercept = mean_like)
 
-# You can even add the same geom twice, which different values on the x and y axes
+# You can even add the same geom twice, with different values on the x and y axes
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
   geom_point() +
-  geom_point(aes(x = mean_comments, y = mean_like, color = "red", size = 6))
+  geom_point(aes(x = mean_comment, y = mean_like, color = "red", size = 6))
 
 # Use the argument 'color = "red"' for red dots
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = "red")) +
@@ -234,11 +247,13 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type))
   geom_point() 
 
 # There are many things you can do by adding layers into the ggplot
-# You could log them
+# You could log them.
+# PS: You will see a warning message, don't worry, it is just because our data contain zeros
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type)) +
   geom_point(alpha = 0.5) + # I made the points transparent for visiblity
   scale_x_log10() +
   scale_y_log10()
+
 
 # Or fit a line
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type)) +
@@ -247,7 +262,7 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type))
   scale_y_log10() +
   geom_smooth(method = "lm", se = FALSE)
 
-# And add labels
+# And add labels and legend
 ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb, color = type)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
@@ -290,23 +305,11 @@ ggplot(data = snp, aes(x = comments_count_fb, y = likes_count_fb)) +
   geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~ type)
 
-########## Exercise ########## 
+########## Exercise 5 ########## 
 # Make a scatter plot of shares by comments count, log both axes,
 # color them by post type, change shape by post type (adding 'shape = sentiment ' in aes())
 ##############################
 
-########## Solution ########## 
-ggplot(data = snp, aes(x = shares_count_fb, y = comments_count_fb, color = type, shape = type)) +
-  geom_point(alpha = 0.5) +
-  scale_x_log10() +
-  scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(x = "Comments Count", y = "Shares Count",
-       title = "Comments and Shares",
-       subtitle = "One post per dot",
-       caption = "Source: Justin Ho")
-
-##############################
 
 ####################################################################################
 ## It's about time                                                                ##
@@ -360,6 +363,7 @@ ggplot(data = snp, aes(x = date, y = likes_count_fb, color = type)) +
 # We need this package
 # install.packages("dplyr")
 library(dplyr)
+library(lubridate)
 
 # For some plots, it might be easier if you transform the data in advance
 # To do so, we have to learn a few things:
@@ -370,9 +374,10 @@ library(dplyr)
 # group_by() is a function to split the data into groups
 # summarise() is a function to make calculation and put the result into a new variable
 
-plot_data <- snp %>% 
+snp %>% # Take 'snp', put into a pipe
   group_by(type, date=floor_date(date, "month")) %>% # split the data by post type and by month
-  summarise(total_likes = sum(likes_count_fb)) # calculate total likes by taking the sum of likes count
+  summarise(total_likes = sum(likes_count_fb)) -> # calculate total likes by taking the sum of likes count
+  plot_data # assign to the new object 'plot_data'
   
 # Have a look at the transformed data
 ggplot(data = plot_data, aes(x = date, y = total_likes, color = type)) +
@@ -391,7 +396,7 @@ ggplot(data = plot_data, aes(x = date, y = total_likes, fill = type)) +
 ggplot(data = plot_data, aes(x = date, y = total_likes, fill = type)) +
   geom_area(position = "fill")
 
-########## Exercise ########## 
+########## Exercise 6 ########## 
 # Using the above codes, aggregate comment counts by month.
 # Plot an area plot (selection a sensibile position)
 
@@ -401,12 +406,14 @@ ggplot(data = plot_data, aes(x = date, y = total_likes, fill = type)) +
 #   summarise(###### = sum(#######))  # Change the ########### into the variable names
 ##############################
 
-########## Solution ########## 
-plot_data <- snp %>% 
-  group_by(type, date=floor_date(date, "month")) %>%
-  summarise(total_comments = sum(comments_count_fb))
 
-ggplot(data = plot_data, aes(x = date, y = total_comments, fill = type)) +
-  geom_area(position = "identity", alpha = 0.8)
+####################################################################################
+## What's next?                                                                   ##
+####################################################################################
 
-##############################
+# You won't be able to learn everything about R in three hours,
+# but I hope this workshop would give you a head start in your progarmming journey.
+# If you would like to learn more, there are plenty (free) resources online:
+# https://www.tidyverse.org/
+# http://www.cookbook-r.com/
+# https://socviz.co/

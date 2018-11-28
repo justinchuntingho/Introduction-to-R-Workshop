@@ -110,6 +110,7 @@ snp$likes_count_fb
 length(snp$likes_count_fb)
 max(snp$likes_count_fb)
 mean(snp$likes_count_fb)
+table(snp$type)
 
 ########## Exercise 2 ########## 
 # Using the 'mean()' function, alter the codes below and calculate the mean value of 

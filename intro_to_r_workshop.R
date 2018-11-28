@@ -130,7 +130,7 @@ which.max(snp$likes_count_fb)
 # We can then use the slicing operator ('[' and ']') to find the post:
 snp[676, ]
 
-# We can combine them into one single link:
+# We can combine them into one single line:
 snp[which.max(snp$likes_count_fb), ]
 
 ########## Exercise 3 ########## 

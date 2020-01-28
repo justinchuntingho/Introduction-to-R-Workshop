@@ -203,17 +203,17 @@ ggplot(snp, aes(x = type)) +
 
 # We could also create a plot for two categorical variables
 # We color the bar by the sentiment of the posts
-ggplot(snp, aes(x = type, y = ..count.., fill = sentiment)) + 
+ggplot(snp, aes(x = type, fill = sentiment)) + 
   geom_bar()
 
 # We can change how these bars are placed, 
 # for example 'position = "dodge"' will place them side by side
-ggplot(snp, aes(x = type, y = ..count.., fill = sentiment)) + 
+ggplot(snp, aes(x = type, fill = sentiment)) + 
   geom_bar(position = "dodge")
 
 # If we use 'position = "fill"', all bar will strech out to fill the whole y axis
 # The y axis then become proportion
-ggplot(snp, aes(x = type, y = ..count.., fill = sentiment)) + 
+ggplot(snp, aes(x = type, fill = sentiment)) + 
   geom_bar(position = "fill") +
   labs(y = "proportion")
 

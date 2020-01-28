@@ -1,5 +1,5 @@
 # Introduction to R
-# Last updated: 22 Nov 2018
+# Last updated: 22 Jan 2020
 
 ####################################################################################
 ## Installing packages                                                            ##
